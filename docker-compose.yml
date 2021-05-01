@@ -2,7 +2,10 @@ version: "3.9"
 
 services:
   api:
-    build: .
+    image: gpspake/fastapi-project:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
     command: uvicorn app.main:app --reload --port 8009
     volumes:
       - .:/app
