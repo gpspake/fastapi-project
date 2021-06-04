@@ -2,7 +2,7 @@ from typing import Optional
 from fastapi import FastAPI
 import sqlalchemy
 
-app = FastAPI(docs_url='/index.html', openapi_prefix='/')
+app = FastAPI(docs_url='/docs', openapi_prefix='/')
 
 @app.get("/")
 def read_root():
