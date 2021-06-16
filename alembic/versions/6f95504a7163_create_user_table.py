@@ -1,4 +1,4 @@
-"""create users table
+"""create user table
 
 Revision ID: 6f95504a7163
 Revises: 
@@ -17,7 +17,7 @@ depends_on = None
 
 def upgrade():
     op.create_table(
-        'users',
+        'user',
         sa.Column('id', sa.String(), nullable=False),
         sa.Column('auth0_id', sa.String(), nullable=True),
         sa.Column('email', sa.String(), nullable=True),
@@ -26,4 +26,4 @@ def upgrade():
 
 
 def downgrade():
-    op.drop_table('users')
+    op.drop_table('user')

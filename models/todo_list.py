@@ -1,9 +1,13 @@
-from models.base_config import BaseConfig
-from models.todo_item import TodoItem
+from pydantic import Field, BaseModel
+from models.todo_item import PydanticTodoItem
 from typing import List
 
 
-class TodoList(BaseConfig):
+class PydanticTodoList(BaseModel):
     id: int
     name: str
-    todo_items: List[TodoItem]
+    todo_items: List[PydanticTodoItem] = Field(alias='todoItems')
+
+    class Config:
+        orm_mode = True
+        allow_population_by_field_name = True

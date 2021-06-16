@@ -1,5 +1,8 @@
 import os
-from typing import Optional
+from typing import Optional, List
+from models.todo_list import PydanticTodoList
+from database.todo_list import get_todo_lists
+from database.user import get_user, User
 from fastapi import FastAPI, Depends, Security
 from fastapi_auth0 import Auth0, Auth0User
 import sqlalchemy
@@ -29,6 +32,14 @@ def get_secure_hello(user: Auth0User = Security(auth.get_user)):
 @app.get("/secure/hello2")
 def get_secure_hello2(user: Auth0User = Security(auth.get_user, scopes=["read:hello"])):
     return {"hello": f"{user}"}
+
+
+@app.get("/api/TodoLists", dependencies=[Depends(auth.implicit_scheme)])
+def get_secure_todo_lists(auth0_user: Auth0User = Security(auth.get_user)):
+    user: User = get_user(auth0_user=auth0_user)
+    todo_lists: List[PydanticTodoList] = get_todo_lists(user=user)
+    data = [todo_list.dict(by_alias=True) for todo_list in todo_lists]
+    return {"data": data}
 
 
 if __name__ == '__main__':
