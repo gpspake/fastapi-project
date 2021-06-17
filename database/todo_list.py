@@ -29,7 +29,7 @@ class TodoItem(Base):
     todo_list = relationship("TodoList", back_populates="todo_items")
 
 
-def get_todo_lists(user: User) -> List[PydanticTodoList]:
+def get_todo_lists(user: PydanticUser) -> List[PydanticTodoList]:
     session = Session()
     results = session.query(TodoList).filter_by(user_id=user.id).all()
     todo_lists = [PydanticTodoList.from_orm(todo_list) for todo_list in results]
@@ -46,7 +46,8 @@ def get_todo_list(todo_list_id: int) -> PydanticTodoList:
 
 
 def create_todo_item(new_todo_item: PydanticTodoItem) -> PydanticTodoItem:
-    todo_item_dict = new_todo_item.dict().pop(id)
+    todo_item_dict = new_todo_item.dict()
+    todo_item_dict.pop('id')
     todo_item = TodoItem(**todo_item_dict)
     session = Session()
     session.add(todo_item)

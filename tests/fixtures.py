@@ -5,6 +5,8 @@ from models.user import PydanticUser
 from models.todo_item import PydanticTodoItem
 from models.todo_list import PydanticTodoList
 
+new_pydantic_todo_item_1 = PydanticTodoItem(id=0, name='Bread', is_complete=True, todo_list_id=1)
+new_pydantic_todo_item_2 = PydanticTodoItem(id=0, name='Milk', is_complete=False, todo_list_id=1)
 
 pydantic_todo_item_1 = PydanticTodoItem(id=1, name='Bread', is_complete=True, todo_list_id=1)
 pydantic_todo_item_2 = PydanticTodoItem(id=2, name='Milk', is_complete=False, todo_list_id=1)

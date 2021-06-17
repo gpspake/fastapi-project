@@ -1,11 +1,10 @@
 import os
 from typing import List
-
 from models.user import PydanticUser
 from models.todo_item import PydanticTodoItem
 from models.todo_list import PydanticTodoList
-from database.todo_list import get_todo_lists, create_todo_item, TodoItem
-from database.user import get_user, User
+from database.todo_list import get_todo_lists, create_todo_item
+from database.user import get_user
 from fastapi import FastAPI, Depends, Security, HTTPException, status
 from fastapi_auth0 import Auth0, Auth0User
 
