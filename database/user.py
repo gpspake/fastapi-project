@@ -5,6 +5,8 @@ from fastapi_auth0 import Auth0User
 from sqlalchemy import Column, String
 import uuid
 
+from models.user import PydanticUser
+
 
 class User(Base):
     __tablename__ = 'user'
@@ -31,8 +33,10 @@ def create_new_user(auth0_user: Auth0User) -> User:
     return user
 
 
-def get_user(auth0_user: Auth0User) -> User:
+def get_user(auth0_user: Auth0User) -> PydanticUser:
     session = Session()
-    user: User = session.query(User).filter_by(auth0_id=auth0_user.id).first()
+    result: User = session.query(User).filter_by(auth0_id=auth0_user.id).first()
+    orm_user = create_new_user(auth0_user) if result is None else result
+    user = PydanticUser.from_orm(orm_user)
     session.close()
-    return create_new_user(auth0_user) if user is None else user
+    return PydanticUser.from_orm(user)

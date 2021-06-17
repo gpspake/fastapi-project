@@ -1,11 +1,11 @@
 from typing import List
-
 from database.base import Base
+from models.todo_item import PydanticTodoItem
 from models.todo_list import PydanticTodoList
 from sqlalchemy.orm import relationship
 from database.user import User
 from db_session import Session
-from sqlalchemy import Column, String, Boolean, Integer, ForeignKey
+from sqlalchemy import Column, String, Boolean, Integer, ForeignKey, Sequence
 
 
 class TodoList(Base):
@@ -43,3 +43,15 @@ def get_todo_list(todo_list_id: int) -> PydanticTodoList:
     todo_list = PydanticTodoList.from_orm(result)
     session.close()
     return todo_list
+
+
+def create_todo_item(new_todo_item: PydanticTodoItem) -> PydanticTodoItem:
+    todo_item_dict = new_todo_item.dict().pop(id)
+    todo_item = TodoItem(**todo_item_dict)
+    session = Session()
+    session.add(todo_item)
+    session.commit()
+    session.refresh(todo_item)
+    pydantic_todo_item = PydanticTodoItem.from_orm(todo_item)
+    session.close()
+    return pydantic_todo_item
