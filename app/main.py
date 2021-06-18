@@ -3,7 +3,7 @@ from typing import List
 from models.user import PydanticUser
 from models.todo_item import PydanticTodoItem
 from models.todo_list import PydanticTodoList
-from database.todo_list import get_todo_lists, create_todo_item
+from database.todo_list import get_todo_lists, create_todo_item, create_todo_list, put_todo_list
 from database.user import get_user
 from fastapi import FastAPI, Depends, Security, HTTPException, status
 from fastapi_auth0 import Auth0, Auth0User
@@ -21,6 +21,26 @@ def get_secure_todo_lists(auth0_user: Auth0User = Security(auth.get_user)):
     todo_lists: List[PydanticTodoList] = get_todo_lists(user=user)
     data = [todo_list.dict(by_alias=True) for todo_list in todo_lists]
     return {"data": data}
+
+
+@app.post("/api/TodoList", dependencies=[Depends(auth.implicit_scheme)])
+def add_todo_list(new_todo_list: PydanticTodoList, auth0_user: Auth0User = Security(auth.get_user)):
+    user: PydanticUser = get_user(auth0_user=auth0_user)
+    todo_list: PydanticTodoList = create_todo_list(new_todo_list, user)
+    return {"todo_list": todo_list.dict(by_alias=True)}
+
+
+@app.post("/api/TodoList/{TodoListId}", dependencies=[Depends(auth.implicit_scheme)])
+def update_todo_list(todo_list: PydanticTodoList, auth0_user: Auth0User = Security(auth.get_user)):
+    user: PydanticUser = get_user(auth0_user=auth0_user)
+    if user.has_todo_list(todo_list.id):
+        updated_todo_list: PydanticTodoList = put_todo_list(todo_list)
+        return {"todo_list": updated_todo_list.dict(by_alias=True)}
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Todo list not found",
+            headers={"WWW-Authenticate": "Basic"})
 
 
 @app.post("/api/TodoItems", dependencies=[Depends(auth.implicit_scheme)])
