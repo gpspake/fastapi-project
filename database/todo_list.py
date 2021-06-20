@@ -38,18 +38,35 @@ def get_todo_lists(user: PydanticUser) -> List[PydanticTodoList]:
 
 def get_todo_list(todo_list_id: int) -> PydanticTodoList:
     session = Session()
-    result = session.query(TodoList).filter_by(todo_list_id=todo_list_id).first()
+    result = session.query(TodoList).filter_by(id=todo_list_id).first()
     todo_list = PydanticTodoList.from_orm(result)
     session.close()
     return todo_list
 
 
-def put_todo_list(todo_list: PydanticTodoList) -> PydanticTodoList:
+def orm_delete_todo_item(todo_item_id: int) -> bool:
     session = Session()
-    stmt = update(TodoList).where(TodoList.id == todo_list.id).values(name=todo_list.name). \
-        execution_options(synchronize_session="fetch")
-    updated_todo_list = session.execute(stmt)
-    pydantic_todo_list = PydanticTodoList.from_orm(updated_todo_list)
+    todo_item = session.query(TodoItem).filter_by(id=todo_item_id).first()
+    result = session.delete(todo_item)
+    session.commit()
+    session.close()
+    return result
+
+
+def get_todo_item(todo_item_id: int) -> PydanticTodoItem:
+    session = Session()
+    result = session.query(TodoItem).filter_by(id=todo_item_id).first()
+    todo_item = PydanticTodoItem.from_orm(result)
+    session.close()
+    return todo_item
+
+
+def update_todo_list_name(todo_list_id: int, new_name: str) -> PydanticTodoList:
+    session = Session()
+    result = session.query(TodoList).filter_by(id=todo_list_id).first()
+    result.name = new_name
+    session.commit()
+    pydantic_todo_list = PydanticTodoList.from_orm(result)
     session.close()
     return pydantic_todo_list
 
