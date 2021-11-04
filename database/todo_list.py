@@ -25,7 +25,7 @@ class TodoItem(Base):
     name = Column(String)
     is_complete = Column(Boolean)
     todo_list_id = Column(Integer, ForeignKey('todo_list.id'))
-    todo_list = relationship("TodoList", back_populates="todo_items")
+    todo_list = relationship("TodoList", back_populates="todo_items", passive_deletes=True)
 
 
 def get_todo_lists(user: PydanticUser) -> List[PydanticTodoList]:
@@ -103,6 +103,15 @@ def create_todo_list(new_todo_list: PydanticTodoList, user: PydanticUser) -> Pyd
     pydantic_todo_list = PydanticTodoList.from_orm(todo_list)
     session.close()
     return pydantic_todo_list
+
+
+def orm_delete_todo_list(todo_list_id: int) -> bool:
+    session = Session()
+    todo_list = session.query(TodoList).get(todo_list_id)
+    session.delete(todo_list)
+    session.commit()
+    session.close()
+    return True
 
 
 def create_todo_item(new_todo_item: PydanticTodoItem) -> PydanticTodoItem:
