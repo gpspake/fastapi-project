@@ -28,7 +28,7 @@ class TodoItem(Base):
     todo_list = relationship("TodoList", back_populates="todo_items", passive_deletes=True)
 
 
-def get_todo_lists(user: PydanticUser) -> List[PydanticTodoList]:
+def orm_read_todo_lists(user: PydanticUser) -> List[PydanticTodoList]:
     session = Session()
     results = session.query(TodoList).filter_by(user_id=user.id).all()
     todo_lists = [PydanticTodoList.from_orm(todo_list) for todo_list in results]
@@ -36,7 +36,7 @@ def get_todo_lists(user: PydanticUser) -> List[PydanticTodoList]:
     return todo_lists
 
 
-def get_todo_list(todo_list_id: int) -> PydanticTodoList:
+def orm_read_todo_list(todo_list_id: int) -> PydanticTodoList:
     session = Session()
     result = session.query(TodoList).filter_by(id=todo_list_id).first()
     todo_list = PydanticTodoList.from_orm(result)
@@ -52,7 +52,7 @@ def orm_delete_todo_item(todo_item_id: int) -> bool:
     return True
 
 
-def get_todo_item(todo_item_id: int) -> PydanticTodoItem:
+def orm_read_todo_item(todo_item_id: int) -> PydanticTodoItem:
     session = Session()
     result = session.query(TodoItem).filter_by(id=todo_item_id).first()
     todo_item = PydanticTodoItem.from_orm(result)
@@ -60,7 +60,7 @@ def get_todo_item(todo_item_id: int) -> PydanticTodoItem:
     return todo_item
 
 
-def update_todo_list_name(todo_list_id: int, new_name: str) -> PydanticTodoList:
+def orm_update_todo_list(todo_list_id: int, new_name: str) -> PydanticTodoList:
     session = Session()
     result = session.query(TodoList).filter_by(id=todo_list_id).first()
     result.name = new_name
@@ -70,7 +70,7 @@ def update_todo_list_name(todo_list_id: int, new_name: str) -> PydanticTodoList:
     return pydantic_todo_list
 
 
-def update_todo_item_status(todo_item_id: int, name: str, is_complete: bool) -> PydanticTodoItem:
+def orm_update_todo_item(todo_item_id: int, name: str, is_complete: bool) -> PydanticTodoItem:
     session = Session()
     result = session.query(TodoItem).filter_by(id=todo_item_id).first()
     result.name = name
@@ -81,7 +81,7 @@ def update_todo_item_status(todo_item_id: int, name: str, is_complete: bool) -> 
     return pydantic_todo_item
 
 
-def create_todo_list(new_todo_list: PydanticTodoList, user: PydanticUser) -> PydanticTodoList:
+def orm_create_todo_list(new_todo_list: PydanticTodoList, user: PydanticUser) -> PydanticTodoList:
     todo_items = []
     for todo_item in new_todo_list.todo_items:
         todo_item_dict = todo_item.dict()
@@ -114,7 +114,7 @@ def orm_delete_todo_list(todo_list_id: int) -> bool:
     return True
 
 
-def create_todo_item(new_todo_item: PydanticTodoItem) -> PydanticTodoItem:
+def orm_create_todo_item(new_todo_item: PydanticTodoItem) -> PydanticTodoItem:
     todo_item_dict = new_todo_item.dict()
     todo_item_dict.pop('id')
     todo_item = TodoItem(**todo_item_dict)
