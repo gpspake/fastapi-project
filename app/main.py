@@ -84,6 +84,18 @@ def add_todo_item(new_todo_item: PydanticTodoItem, auth0_user: Auth0User = Secur
             headers={"WWW-Authenticate": "Basic"})
 
 
+@app.put("/api/TodoItems/{todo_item_id}", dependencies=[Depends(auth.implicit_scheme)], tags=["Todo Items"])
+def update_todo_item(todo_item: PydanticTodoItem, auth0_user: Auth0User = Security(auth.get_user)):
+    user: PydanticUser = get_user(auth0_user=auth0_user)
+    if user.has_todo_list(todo_item.todo_list_id):
+        updated_todo_item: PydanticTodoItem = update_todo_item_status(todo_item.id, todo_item.name, todo_item.is_complete)
+        return updated_todo_item.dict(by_alias=True)
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Todo list not found",
+            headers={"WWW-Authenticate": "Basic"})
+
 if __name__ == '__main__':
     import uvicorn
     reload = True

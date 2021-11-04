@@ -71,6 +71,17 @@ def update_todo_list_name(todo_list_id: int, new_name: str) -> PydanticTodoList:
     return pydantic_todo_list
 
 
+def update_todo_item_status(todo_item_id: int, name: str, is_complete: bool) -> PydanticTodoItem:
+    session = Session()
+    result = session.query(TodoItem).filter_by(id=todo_item_id).first()
+    result.name = name
+    result.is_complete = is_complete
+    session.commit()
+    pydantic_todo_item = PydanticTodoItem.from_orm(result)
+    session.close()
+    return pydantic_todo_item
+
+
 def create_todo_list(new_todo_list: PydanticTodoList, user: PydanticUser) -> PydanticTodoList:
     todo_items = []
     for todo_item in new_todo_list.todo_items:
