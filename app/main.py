@@ -96,6 +96,20 @@ def update_todo_item(todo_item: PydanticTodoItem, auth0_user: Auth0User = Securi
             detail="Todo list not found",
             headers={"WWW-Authenticate": "Basic"})
 
+
+@app.delete("/api/TodoItems/{todo_item_id}", dependencies=[Depends(auth.implicit_scheme)], tags=["Todo Items"])
+def delete_todo_item(todo_item_id: int, auth0_user: Auth0User = Security(auth.get_user)):
+    user: PydanticUser = get_user(auth0_user=auth0_user)
+    todo_item = get_todo_item(todo_item_id=todo_item_id)
+    if user.has_todo_list(todo_item.todo_list_id):
+        return orm_delete_todo_item(todo_item_id)
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Todo list not found",
+            headers={"WWW-Authenticate": "Basic"})
+
+
 if __name__ == '__main__':
     import uvicorn
     reload = True

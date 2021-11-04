@@ -46,11 +46,10 @@ def get_todo_list(todo_list_id: int) -> PydanticTodoList:
 
 def orm_delete_todo_item(todo_item_id: int) -> bool:
     session = Session()
-    todo_item = session.query(TodoItem).filter_by(id=todo_item_id).first()
-    result = session.delete(todo_item)
+    session.query(TodoItem).filter(TodoItem.id == todo_item_id).delete()
     session.commit()
     session.close()
-    return result
+    return True
 
 
 def get_todo_item(todo_item_id: int) -> PydanticTodoItem:
